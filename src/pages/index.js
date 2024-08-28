@@ -53,7 +53,7 @@ export default function Home() {
       [selectedPerson]: [
         ...(transactions[selectedPerson] || []),
         newTransaction,
-      ],
+      ].sort((a, b) => new Date(b.date) - new Date(a.date)), // 최신 날짜 기준 정렬
     };
 
     setTransactions(newTransactions);
@@ -108,6 +108,12 @@ export default function Home() {
       <Balance>현재 남은 금액: {balance}₩</Balance>
 
       <h3>거래 내역</h3>
+      <TransactionGuied>
+        <span></span>
+        <small>빌려간 돈</small>
+        <span></span>
+        <small>값은 돈</small>
+      </TransactionGuied>
       <TransactionList>
         {(transactions[selectedPerson] || []).map((transaction, index) => (
           <TransactionItem key={index} isPositive={transaction.amount > 0}>
@@ -189,6 +195,27 @@ const Balance = styled.h2`
   font-size: 1.8em;
   text-align: center;
   font-weight: bold;
+`;
+
+const TransactionGuied = styled.div`
+  display: flex;
+  gap: 20px;
+
+  span {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+
+    &:nth-child(1) {
+      background-color: #28a745;
+    }
+    &:nth-child(3) {
+      background-color: #dc3545;
+    }
+  }
+
+  small {
+  }
 `;
 
 const TransactionList = styled.ul`
