@@ -1,21 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
 
-import {
-  Container,
-  Title,
-  Select,
-  Input,
-  Button,
-  Total,
-  TransactionGuied,
-  TransactionList,
-  TransactionItem,
-  ClearButton,
-  ModalOverlay,
-  ModalContent,
-  ModalTitle,
-} from "./styles";
+import Styles from "./styles";
 
 export default function Home() {
   const [transactions, setTransactions] = useState([]);
@@ -166,9 +152,9 @@ export default function Home() {
   };
 
   return (
-    <Container>
-      <Title>거래 관리</Title>
-      <Select
+    <Styles.Container>
+      <Styles.Title>거래 관리</Styles.Title>
+      <Styles.Select
         value={selectedPerson}
         onChange={(e) => setSelectedPerson(e.target.value)}
       >
@@ -180,66 +166,66 @@ export default function Home() {
           </option>
           </>
         ))}
-      </Select>
-      <Input
+      </Styles.Select>
+      <Styles.Input
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
       />
-      <Input
+      <Styles.Input
         type="number"
         value={formattedBalance(amount)}
         onChange={(e) => setAmount(e.target.value)}
         placeholder="금액 입력"
       />
-      <Button onClick={upsertTransaction}>
+      <Styles.Button onClick={upsertTransaction}>
         거래 추가
-      </Button>
+      </Styles.Button>
       <div>
         <h3>{selectedPerson}의 현재 남은 잔금</h3>
-        <Total>{formattedBalance(balance)}₩</Total>
+        <Styles.Total>{formattedBalance(balance)}₩</Styles.Total>
       </div>
 
       <h3>거래 내역</h3>
-      <TransactionGuied>
+      <Styles.TransactionGuied>
         <span></span>
         <small>빌린 돈</small>
         <span></span>
         <small>값은 돈</small>
-      </TransactionGuied>
-      <TransactionList>
+      </Styles.TransactionGuied>
+      <Styles.TransactionList>
         {transactions.map((transaction, index) => (
-          <TransactionItem key={index} isPositive={transaction.amount > 0}>
+          <Styles.TransactionItem key={index} isPositive={transaction.amount > 0}>
             <span>{transaction.date}</span>
             <small>{formattedBalance(transaction.amount)}₩</small>
             <div style={{ display: "flex", gap: "0.5rem" }}>
-              <Button variant='edit' onClick={() => openEditModal(index)}>수정</Button>
-              <Button variant='delete' onClick={() => deleteTransaction(index)}>삭제</Button>
+              <Styles.Button variant='edit' onClick={() => openEditModal(index)}>수정</Styles.Button>
+              <Styles.Button variant='delete' onClick={() => deleteTransaction(index)}>삭제</Styles.Button>
             </div>
-          </TransactionItem>
+          </Styles.TransactionItem>
         ))}
-      </TransactionList>
+      </Styles.TransactionList>
 
-      <ClearButton onClick={clearAllTransactions}>전체 초기화</ClearButton>
+      <Styles.ClearButton onClick={clearAllTransactions}>전체 초기화</Styles.ClearButton>
 
       {isModalOpen && (
-        <ModalOverlay>
-          <ModalContent>
-            <ModalTitle>{selectedPerson}의 거래 내역 수정</ModalTitle>
-            <Input
+        <Styles.ModalOverlay>
+          <Styles.ModalContent>
+            <Styles.ModalTitle>{selectedPerson}의 거래 내역 수정</Styles.ModalTitle>
+            <Styles.Input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-            <Input
+            <Styles.Input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="금액 입력"
             />
             <div style={{ display: "flex", gap: "0.5rem", justifyContent: 'flex-end' }}>
-              <Button variant='edit' onClick={upsertTransaction}>수정 완료</Button>
-              <Button
+              <Styles.Button variant='edit' onClick={upsertTransaction}>수정 완료</Styles.Button>
+              <Styles.Button
               variant='delete'
                 onClick={() => {
                   setIsModalOpen(false);
@@ -248,11 +234,11 @@ export default function Home() {
                 }}
               >
                 취소
-              </Button>
+              </Styles.Button>
             </div>
-          </ModalContent>
-        </ModalOverlay>
+          </Styles.ModalContent>
+        </Styles.ModalOverlay>
       )}
-    </Container>
+    </Styles.Container>
   );
 }

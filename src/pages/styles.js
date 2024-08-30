@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 // 스타일 컴포넌트 정의
-export const Container = styled.div`
+const Container = styled.div`
   padding: 40px;
   max-width: 750px;
   margin: 20px auto;
@@ -10,7 +10,7 @@ export const Container = styled.div`
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
-export const Title = styled.h1`
+const Title = styled.h1`
   text-align: center;
   color: #333;
   font-family: "Arial", sans-serif;
@@ -18,7 +18,7 @@ export const Title = styled.h1`
   margin-bottom: 30px;
 `;
 
-export const Select = styled.select`
+const Select = styled.select`
   padding: 12px 15px;
   margin-right: 10px;
   margin-bottom: 20px;
@@ -33,7 +33,7 @@ export const Select = styled.select`
   }
 `;
 
-export const Input = styled.input`
+const Input = styled.input`
   padding: 12px 15px;
   margin-right: 10px;
   margin-bottom: 20px;
@@ -48,7 +48,7 @@ export const Input = styled.input`
   }
 `;
 
-export const Button = styled.button`
+const Button = styled.button`
   padding: 12px 20px;
   border: none;
   background-color: ${(props) => {
@@ -72,7 +72,7 @@ export const Button = styled.button`
   }
 `;
 
-export const ClearButton = styled.button`
+const ClearButton = styled.button`
   padding: 12px 20px;
   margin-top: 20px;
   border: none;
@@ -89,7 +89,7 @@ export const ClearButton = styled.button`
   }
 `;
 
-export const Total = styled.h2`
+const Total = styled.h2`
   color: #d4ff3b;
   font-size: 1.5em;
   font-weight: bold;
@@ -99,7 +99,7 @@ export const Total = styled.h2`
   text-align: center;
 `;
 
-export const TransactionGuied = styled.div`
+const TransactionGuied = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -125,13 +125,13 @@ export const TransactionGuied = styled.div`
   }
 `;
 
-export const TransactionList = styled.ul`
+const TransactionList = styled.ul`
   margin-top: 30px;
   list-style-type: none;
   padding: 0;
 `;
 
-export const TransactionItem = styled.li`
+const TransactionItem = styled.li`
   padding: 10px;
   border-bottom: 1px solid #eee;
   background-color: #fff;
@@ -158,7 +158,7 @@ export const TransactionItem = styled.li`
     color: ${(props) => (props.isPositive ? "#28a745" : "#dc3545")};
   }
 `;
-export const ModalOverlay = styled.div`
+const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -170,7 +170,7 @@ export const ModalOverlay = styled.div`
   align-items: center;
 `;
 
-export const ModalContent = styled.div`
+const ModalContent = styled.div`
   background-color: white;
   padding: 20px;
   border-radius: 10px;
@@ -179,12 +179,12 @@ export const ModalContent = styled.div`
   width: 100%;
 `;
 
-export const ModalTitle = styled.h3`
+const ModalTitle = styled.h3`
   margin-bottom: 20px;
   font-size: 1.5em;
 `;
 
-const styles = {
+const Styles = {
   Container,
   Title,
   Select,
@@ -200,4 +200,4 @@ const styles = {
   ModalTitle,
 };
 
-export default styles;
+export default Styles;
