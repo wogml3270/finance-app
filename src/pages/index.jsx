@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { supabase } from "../utils/supabase"; // Supabase 클라이언트 가져오기
 
 import {
   Container,
@@ -30,81 +31,88 @@ export default function Home() {
   // 거래 대상 목록
   const people = ["이현동", "이강청", "구대원"];
 
-  // 거래 내역을 localStorage에서 불러오기
+  // Supabase에서 거래 내역을 불러오기
   useEffect(() => {
-    const savedTransactions =
-      JSON.parse(localStorage.getItem("transactions")) || {};
-    setTransactions(savedTransactions);
-    const initialBalance =
-      savedTransactions[selectedPerson]?.reduce(
+    fetchTransactions();
+  }, [selectedPerson]);
+
+  const fetchTransactions = async () => {
+    const { data, error } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("person", selectedPerson)
+      .order("date", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching transactions:", error);
+    } else {
+      setTransactions(data);
+      const initialBalance = data.reduce(
         (acc, curr) => acc + curr.amount,
         0
-      ) || 0;
-    setBalance(initialBalance);
-  }, []);
+      );
+      setBalance(initialBalance);
+    }
+  };
 
-  // 거래 대상이 변경될 때 잔액 업데이트
-  useEffect(() => {
-    const personTransactions = transactions[selectedPerson] || [];
-    const personBalance = personTransactions.reduce(
-      (acc, curr) => acc + curr.amount,
-      0
-    );
-    setBalance(personBalance);
-  }, [selectedPerson, transactions]);
-
-  // 거래 추가 함수
-  const addTransaction = () => {
+  // 거래 추가 또는 수정 함수
+  const upsertTransaction = async () => {
     const newAmount = parseFloat(amount);
     if (isNaN(newAmount) || !date) {
       alert("날짜와 금액 모두 입력해야합니다.");
       return;
     }
-
+  
     const newTransaction = {
+      id: editIndex !== null ? transactions[editIndex].id : undefined,
+      person: selectedPerson,
       amount: newAmount,
       date: date,
     };
-
-    let newTransactions;
-    if (editIndex !== null) {
-      // 수정 모드
-      newTransactions = {
-        ...transactions,
-        [selectedPerson]: transactions[selectedPerson]
-          .map((transaction, index) =>
-            index === editIndex ? newTransaction : transaction
+  
+    try {
+      const { data, error } = await supabase
+        .from("transactions")
+        .upsert(newTransaction, { returning: "representation" }) // upsert 사용
+        .select();
+  
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error("데이터를 가져오지 못했습니다.");
+  
+      const updatedTransactions = editIndex !== null
+        ? transactions.map((transaction, index) =>
+            index === editIndex ? data[0] : transaction
           )
-          .sort((a, b) => new Date(b.date) - new Date(a.date)),
-      };
+        : [data[0], ...transactions];
+  
+      // 거래 내역을 최신 날짜순으로 정렬
+      const sortedTransactions = updatedTransactions.sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
+  
+      setTransactions(sortedTransactions);
+  
+      // 잔액 업데이트
+      const newBalance = sortedTransactions.reduce(
+        (acc, curr) => acc + curr.amount,
+        0
+      );
+      setBalance(newBalance);
+      setAmount("");
+      setDate("");
+      setIsModalOpen(false);
       setEditIndex(null);
-    } else {
-      // 추가 모드
-      newTransactions = {
-        ...transactions,
-        [selectedPerson]: [
-          ...(transactions[selectedPerson] || []),
-          newTransaction,
-        ].sort((a, b) => new Date(b.date) - new Date(a.date)),
-      };
+    } catch (error) {
+      console.error("거래 추가/수정 중 오류가 발생했습니다:", error.message);
+      alert("거래를 처리하는 중 문제가 발생했습니다. 다시 시도해주세요.");
     }
-
-    setTransactions(newTransactions);
-    localStorage.setItem("transactions", JSON.stringify(newTransactions)); // localStorage에 저장
-
-    const newBalance = newTransactions[selectedPerson].reduce(
-      (acc, curr) => acc + curr.amount,
-      0
-    );
-    setBalance(newBalance);
-    setAmount("");
-    setDate("");
-    setIsModalOpen(false); // 모달 닫기
   };
+  
+  
 
   // 개별 거래 수정 함수
   const openEditModal = (index) => {
-    const transactionToEdit = transactions[selectedPerson][index];
+    const transactionToEdit = transactions[index];
     setAmount(transactionToEdit.amount);
     setDate(transactionToEdit.date);
     setEditIndex(index);
@@ -112,18 +120,21 @@ export default function Home() {
   };
 
   // 개별 거래 삭제 함수
-  const deleteTransaction = (index) => {
-    const newTransactions = {
-      ...transactions,
-      [selectedPerson]: transactions[selectedPerson].filter(
-        (_, i) => i !== index
-      ),
-    };
+  const deleteTransaction = async (index) => {
+    const { id } = transactions[index];
+    const { error } = await supabase
+      .from("transactions")
+      .delete()
+      .eq("id", id);
 
-    setTransactions(newTransactions);
-    localStorage.setItem("transactions", JSON.stringify(newTransactions));
+    if (error) {
+      console.error("Error deleting transaction:", error);
+      return;
+    }
 
-    const newBalance = newTransactions[selectedPerson].reduce(
+    const updatedTransactions = transactions.filter((_, i) => i !== index);
+    setTransactions(updatedTransactions);
+    const newBalance = updatedTransactions.reduce(
       (acc, curr) => acc + curr.amount,
       0
     );
@@ -131,18 +142,22 @@ export default function Home() {
   };
 
   // 전체 거래 초기화 함수
-  const clearAllTransactions = () => {
+  const clearAllTransactions = async () => {
     const confirmation = window.confirm(
-      "정말 초기화 하시겠습니까? 내역은 완전히 삭제되어 복구할 수 없습니다."
+      `${selectedPerson}의 거래 내역을 모두 초기화합니다. 내역은 완전히 삭제되어 복구할 수 없습니다.`
     );
     if (confirmation) {
-      const newTransactions = {
-        ...transactions,
-        [selectedPerson]: [],
-      };
+      const { error } = await supabase
+        .from("transactions")
+        .delete()
+        .eq("person", selectedPerson);
 
-      setTransactions(newTransactions);
-      localStorage.setItem("transactions", JSON.stringify(newTransactions));
+      if (error) {
+        console.error("Error clearing transactions:", error);
+        return;
+      }
+
+      setTransactions([]);
       setBalance(0);
     }
   };
@@ -150,12 +165,11 @@ export default function Home() {
   // 1000단위 콤마 함수
   const formattedBalance = (value) => {
     return value.toLocaleString();
-  }
+  };
 
   return (
     <Container>
       <Title>거래 관리</Title>
-
       <Select
         value={selectedPerson}
         onChange={(e) => setSelectedPerson(e.target.value)}
@@ -166,7 +180,6 @@ export default function Home() {
           </option>
         ))}
       </Select>
-
       <Input
         type="date"
         value={date}
@@ -178,12 +191,12 @@ export default function Home() {
         onChange={(e) => setAmount(e.target.value)}
         placeholder="금액 입력"
       />
-      <Button onClick={addTransaction}>거래 추가</Button>
+      <Button onClick={upsertTransaction}>
+        거래 추가
+      </Button>
       <div>
         <h3>{selectedPerson}의 현재 남은 잔금</h3>
-        <Total>
-          {formattedBalance(balance)}₩
-        </Total>
+        <Total>{formattedBalance(balance)}₩</Total>
       </div>
 
       <h3>거래 내역</h3>
@@ -194,7 +207,7 @@ export default function Home() {
         <small>값은 돈</small>
       </TransactionGuied>
       <TransactionList>
-        {(transactions[selectedPerson] || []).map((transaction, index) => (
+        {transactions.map((transaction, index) => (
           <TransactionItem key={index} isPositive={transaction.amount > 0}>
             <span>{transaction.date}</span>
             <small>{formattedBalance(transaction.amount)}₩</small>
@@ -224,13 +237,14 @@ export default function Home() {
               placeholder="금액 입력"
             />
             <div>
-              <ModalButton onClick={addTransaction}>저장</ModalButton>
-              <ModalCloseButton onClick={() => {
-                setIsModalOpen(false);
-                setDate('');
-                setAmount('');
-              }
-              }>
+              <ModalButton onClick={upsertTransaction}>수정 완료</ModalButton>
+              <ModalCloseButton
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setDate("");
+                  setAmount("");
+                }}
+              >
                 취소
               </ModalCloseButton>
             </div>
