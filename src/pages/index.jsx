@@ -21,7 +21,7 @@ export default function Home() {
   const [transactions, setTransactions] = useState([]);
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
-  const [selectedPerson, setSelectedPerson] = useState("이현동");
+  const [selectedPerson, setSelectedPerson] = useState("");
   const [balance, setBalance] = useState(0);
   const [editIndex, setEditIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -172,13 +172,11 @@ export default function Home() {
         value={selectedPerson}
         onChange={(e) => setSelectedPerson(e.target.value)}
       >
-        <option value={null} defaultValue={null}>선택하세요</option>
+        <option value='' disabled>선택하세요</option>
         {people.map((person) => (
-          <>
           <option key={person} value={person}>
             {person}
           </option>
-          </>
         ))}
       </Select>
       <Input

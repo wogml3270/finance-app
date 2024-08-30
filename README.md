@@ -15,3 +15,5 @@
 #### v1.4 : 버튼 스타일 조건부 렌더링 추가
 
 #### v1.5 : styles.js default 렌더링 추가, build 테스트
+
+#### v1.6 : select 박스의 default option 추가, build 테스트
