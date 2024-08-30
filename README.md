@@ -13,3 +13,5 @@
 #### v1.3 : supabase key와 url, client 설정, localStorage 제거 및 supabase 문법으로 CRUD 코드 수정, 테스트 완료
 
 #### v1.4 : 버튼 스타일 조건부 렌더링 추가
+
+#### v1.5 : styles.js default 렌더링 추가, build 테스트

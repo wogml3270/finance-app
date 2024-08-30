@@ -15,8 +15,6 @@ import {
   ModalOverlay,
   ModalContent,
   ModalTitle,
-  ModalButton,
-  ModalCloseButton,
 } from "./styles";
 
 export default function Home() {

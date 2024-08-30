@@ -184,33 +184,20 @@ export const ModalTitle = styled.h3`
   font-size: 1.5em;
 `;
 
-export const ModalButton = styled.button`
-  padding: 10px 15px;
-  border: none;
-  background-color: #00cc11;
-  color: white;
-  border-radius: 5px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-right: 10px;
+const styles = {
+  Container,
+  Title,
+  Select,
+  Input,
+  Button,
+  ClearButton,
+  Total,
+  TransactionGuied,
+  TransactionList,
+  TransactionItem,
+  ModalOverlay,
+  ModalContent,
+  ModalTitle,
+};
 
-  &:hover {
-    background-color: #005bb5;
-  }
-`;
-
-export const ModalCloseButton = styled.button`
-  padding: 10px 15px;
-  border: none;
-  background-color: #dc3545;
-  color: white;
-  border-radius: 5px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #c82333;
-  }
-`;
+export default styles;
