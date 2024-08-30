@@ -51,7 +51,16 @@ export const Input = styled.input`
 export const Button = styled.button`
   padding: 12px 20px;
   border: none;
-  background-color: #0070f3;
+  background-color: ${(props) => {
+    switch (props.variant) {
+      case "edit":
+        return "#00b320";
+      case "delete":
+        return "#dc3545";
+      default:
+        return "#0070f3";
+    }
+  }};
   color: white;
   border-radius: 5px;
   font-size: 1em;
@@ -146,7 +155,7 @@ export const TransactionItem = styled.li`
     flex: 1;
     font-weight: bold;
     font-size: 1.1em;
-    color: ${(status) => (status.isPositive ? "#28a745" : "#dc3545")};
+    color: ${(props) => (props.isPositive ? "#28a745" : "#dc3545")};
   }
 `;
 export const ModalOverlay = styled.div`

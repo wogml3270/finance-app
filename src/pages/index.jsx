@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../utils/supabase"; // Supabase 클라이언트 가져오기
+import { supabase } from "@/utils/supabase";
 
 import {
   Container,
@@ -174,10 +174,13 @@ export default function Home() {
         value={selectedPerson}
         onChange={(e) => setSelectedPerson(e.target.value)}
       >
+        <option value={null} defaultValue={null}>선택하세요</option>
         {people.map((person) => (
+          <>
           <option key={person} value={person}>
             {person}
           </option>
+          </>
         ))}
       </Select>
       <Input
@@ -212,8 +215,8 @@ export default function Home() {
             <span>{transaction.date}</span>
             <small>{formattedBalance(transaction.amount)}₩</small>
             <div style={{ display: "flex", gap: "0.5rem" }}>
-              <Button onClick={() => openEditModal(index)}>수정</Button>
-              <Button onClick={() => deleteTransaction(index)}>삭제</Button>
+              <Button variant='edit' onClick={() => openEditModal(index)}>수정</Button>
+              <Button variant='delete' onClick={() => deleteTransaction(index)}>삭제</Button>
             </div>
           </TransactionItem>
         ))}
@@ -236,9 +239,10 @@ export default function Home() {
               onChange={(e) => setAmount(e.target.value)}
               placeholder="금액 입력"
             />
-            <div>
-              <ModalButton onClick={upsertTransaction}>수정 완료</ModalButton>
-              <ModalCloseButton
+            <div style={{ display: "flex", gap: "0.5rem", justifyContent: 'flex-end' }}>
+              <Button variant='edit' onClick={upsertTransaction}>수정 완료</Button>
+              <Button
+              variant='delete'
                 onClick={() => {
                   setIsModalOpen(false);
                   setDate("");
@@ -246,7 +250,7 @@ export default function Home() {
                 }}
               >
                 취소
-              </ModalCloseButton>
+              </Button>
             </div>
           </ModalContent>
         </ModalOverlay>

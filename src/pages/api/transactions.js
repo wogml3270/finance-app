@@ -7,13 +7,11 @@ export default async function handler(req, res) {
     case "GET":
       return handleGet(req, res);
     case "POST":
-      return handlePost(req, res);
-    case "PUT":
-      return handlePut(req, res);
+      return handleUpsert(req, res);
     case "DELETE":
       return handleDelete(req, res);
     default:
-      res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
+      res.setHeader("Allow", ["GET", "POST", "DELETE"]);
       return res.status(405).end(`Method ${method} Not Allowed`);
   }
 }
@@ -39,9 +37,9 @@ async function handleGet(req, res) {
   return res.status(200).json(data);
 }
 
-// POST: 새로운 거래 추가
-async function handlePost(req, res) {
-  const { person, amount, date } = req.body;
+// POST (upsert): 새로운 거래 추가 또는 기존 거래 수정
+async function handleUpsert(req, res) {
+  const { id, person, amount, date } = req.body;
 
   if (!person || !amount || !date) {
     return res
@@ -49,29 +47,19 @@ async function handlePost(req, res) {
       .json({ error: "Person, amount, and date are required" });
   }
 
-  const { data, error } = await supabase
-    .from("transactions")
-    .insert([{ person, amount, date }]);
+  const upsertData = {
+    person,
+    amount,
+    date,
+  };
 
-  if (error) {
-    return res.status(500).json({ error: error.message });
-  }
-
-  return res.status(201).json(data[0]);
-}
-
-// PUT: 거래 수정
-async function handlePut(req, res) {
-  const { id, amount, date } = req.body;
-
-  if (!id || !amount || !date) {
-    return res.status(400).json({ error: "ID, amount, and date are required" });
+  if (id) {
+    upsertData.id = id;
   }
 
   const { data, error } = await supabase
     .from("transactions")
-    .update({ amount, date })
-    .eq("id", id);
+    .upsert(upsertData, { returning: "representation" });
 
   if (error) {
     return res.status(500).json({ error: error.message });
