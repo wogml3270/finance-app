@@ -4,7 +4,7 @@ import styled from "styled-components";
 export const Container = styled.div`
   padding: 40px;
   max-width: 750px;
-  margin: 20px auto;
+  margin: 0 auto;
   background-color: transparent;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -19,6 +19,7 @@ export const Title = styled.h1`
 `;
 
 export const Select = styled.select`
+  width: 100%;
   padding: 12px 15px;
   margin-right: 10px;
   margin-bottom: 20px;
@@ -35,8 +36,7 @@ export const Select = styled.select`
 
 export const Input = styled.input`
   padding: 12px 15px;
-  margin-right: 10px;
-  margin-bottom: 20px;
+  flex: 1;
   border: 2px solid #ddd;
   border-radius: 5px;
   font-size: 1em;
@@ -50,6 +50,7 @@ export const Input = styled.input`
 
 export const Button = styled.button`
   padding: 12px 20px;
+  flex: 0.5;
   border: none;
   background-color: ${(props) => {
     switch (props.variant) {
@@ -177,6 +178,9 @@ export const ModalContent = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   max-width: 400px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 `;
 
 export const ModalTitle = styled.h3`
