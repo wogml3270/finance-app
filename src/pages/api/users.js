@@ -16,26 +16,30 @@ export default async function handler(req, res) {
     // 새 거래자 추가
     case "POST":
       const { name, email } = req.body;
-      const { data: newUser, error: createError } = await supabase
+
+      // 이메일 중복 확인
+      const { data: existingUsers, error: fetchErrorEmail } = await supabase
         .from("users")
-        .insert([{ name, email }]);
+        .select("*")
+        .eq("email", email);
 
-      // 오류 확인
-      if (createError) {
-        console.error("Error creating user:", createError);
-        return res.status(400).json({ error: createError.message });
+      if (fetchErrorEmail) {
+        return res.status(400).json({ error: fetchErrorEmail.message });
       }
 
-      // 데이터가 비어있는지 확인
-      if (!newUser || newUser.length === 0) {
-        return res
-          .status(400)
-          .json({ error: "User creation failed, no data returned." });
+      if (existingUsers.length > 0) {
+        return res.status(400).json({ message: "이메일이 이미 존재합니다." });
       }
-      console.log(newUser);
 
-      // 성공적으로 생성된 사용자 반환
-      return res.status(201).json(newUser[0]);
+      const { data: newUser, error: insertError } = await supabase
+        .from("users")
+        .insert([{ name, email }])
+        .select();
+
+      if (insertError) {
+        return res.status(400).json({ error: insertError.message });
+      }
+      return res.status(201).json(newUser);
 
     default:
       res.setHeader("Allow", ["GET", "POST"]);

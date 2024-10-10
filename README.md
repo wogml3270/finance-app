@@ -19,3 +19,5 @@
 #### v1.6 : select 박스의 default option 추가, build 테스트
 
 ### v1.7 : api, 클라이언트측 코드 수정 중, supabase 테이블 새로 생성
+
+### v1.8 : api 핸들러 이메일 중복 예외처리 추가 및 수정

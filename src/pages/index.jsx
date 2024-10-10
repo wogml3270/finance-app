@@ -24,7 +24,7 @@ export default function Home() {
   const [transactions, setTransactions] = useState([]);
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
-  const [people, setPeople] = useState([]); // 거래자 목록
+  const [user, setUser] = useState([]);
   const [selectedPerson, setSelectedPerson] = useState("");
   const [balance, setBalance] = useState(0);
   const [editIndex, setEditIndex] = useState(null);
@@ -34,7 +34,7 @@ export default function Home() {
   async function fetchPeople() {
     try {
       const response = await axios.get("/api/transactions"); // 거래자 목록 불러오기
-      setPeople(response.data);
+      setUser(response.data);
     } catch (error) {
       console.error("Error fetching people:", error.response?.data || error.message);
     }
@@ -177,7 +177,7 @@ export default function Home() {
   return (
     <Container>
       <Title>거래 관리</Title>
-      <AddPeople />
+      <AddPeople user={user} setUser={setUser} />
       <div>
         <Select
           value={selectedPerson}
@@ -186,9 +186,9 @@ export default function Home() {
           <option value="" disabled>
             거래자 선택
           </option>
-          {people.map((person, index) => (
-            <option key={index} value={person}>
-              {person}
+          {user.map((user) => (
+            <option key={user.id} value={user.name}>
+              {user.name}
             </option>
           ))}
         </Select>
@@ -212,7 +212,7 @@ export default function Home() {
       </div>
 
       <div>
-        <h3>{selectedPerson}의 현재 남은 잔금</h3>
+        <h3>{`${selectedPerson}의 현재 남은 잔금`}</h3>
         <Total>{formattedBalance(balance)}₩</Total>
       </div>
 
